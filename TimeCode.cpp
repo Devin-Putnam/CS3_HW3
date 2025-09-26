@@ -81,7 +81,7 @@ void TimeCode::GetComponents(unsigned int& hr, unsigned int& min, unsigned int& 
 
 //Formats the output for the user
 string TimeCode::ToString() const {
-    std::ostringstream oss;
+    ostringstream oss;
     oss << GetHours() << ':' << GetMinutes() << ':' << GetSeconds();
     return oss.str();
 }
