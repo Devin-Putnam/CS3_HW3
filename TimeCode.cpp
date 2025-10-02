@@ -10,7 +10,13 @@ The real time value is stored as an instance variable t that is only seen by the
 #include <stdexcept>
 #include <sstream>
 #include "TimeCode.h"
+
 using namespace std;
+
+TimeCode::TimeCode(const TimeCode& other) {
+    t = other.t;  
+}
+
 
 //The code must use the time as t
 long long unsigned int TimeCode::ComponentsToSeconds(unsigned int hr, unsigned int min, unsigned long long int sec){
@@ -108,7 +114,7 @@ TimeCode TimeCode::operator*(double a) const {
         throw invalid_argument("Must be non-negative");
     }
     long double product = static_cast<long double>(t) * static_cast<long double>(a);
-    unsigned long long sec = static_cast<unsigned long long>(product + 0.5);
+    unsigned long long sec = static_cast<unsigned long long>(product);
     TimeCode out;
     out.t = sec;
     return out;
@@ -119,7 +125,7 @@ TimeCode TimeCode::operator/(double a) const {
         throw invalid_argument("Divisor must be > 0");
     }
     long double divisor = static_cast<long double>(t) / static_cast<long double>(a);
-    unsigned long long sec = static_cast<unsigned long long>(divisor + 0.5);
+    unsigned long long sec = static_cast<unsigned long long>(divisor);
     TimeCode out;
     out.t = sec;
     return out;

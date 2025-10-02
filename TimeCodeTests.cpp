@@ -335,6 +335,75 @@ void TestResetAndSeconds() {
     cout << "PASSED!" << endl << endl;
 }
 
+
+void TestCopyConstructor(){
+	cout << "Testing Copy Constructor" << endl;
+	
+	// test 1
+	TimeCode tc = TimeCode(3, 17, 42);
+	TimeCode tc2 = TimeCode(tc);
+	assert(tc2.ToString() == "3:17:42");
+	
+	// test 2
+	TimeCode tc3 = TimeCode(3, 71, 3801);
+	TimeCode tc4 = TimeCode(tc3);
+	assert(tc3.ToString() == "5:14:21");
+	assert(tc4.ToString() == "5:14:21");
+	
+	// test 3
+	tc3.SetHours(8);
+	assert(tc3.ToString() == "8:14:21");
+	assert(tc4.ToString() == "5:14:21");
+	
+	
+	cout << "PASSED!" << endl << endl;
+}
+
+
+void TestMultiply(){
+	cout << "Testing Multiply" << endl;
+	
+	// test 1
+	TimeCode tc1 = TimeCode(0, 1, 0);
+	TimeCode tc2 = tc1 * 2;
+	assert(tc2.ToString() == "0:2:0");
+	
+	// test 2
+	TimeCode tc3 = TimeCode(3, 5, 17);
+	TimeCode tc4 = tc3 * 5.5;
+	//cout << "tc4: " << tc4.ToString() << endl;
+	assert(tc4.ToString() == "16:59:3");
+	
+	// test 3
+	TimeCode tc5 = TimeCode(0, 5, 0);
+	TimeCode tc6 = tc5 * 2.5;
+	assert(tc6.ToString() == "0:12:30");
+
+	// test 4
+	tc6 = tc5 * 2.74;
+	assert(tc6.ToString() == "0:13:42");
+	
+	// test 5
+	TimeCode tc7 = TimeCode(0, 5, 0);
+	TimeCode tc8 = tc7 * 0.5;
+	assert(tc8.ToString() == "0:2:30");
+
+	// test 6, negative number test
+	try{
+		TimeCode tc10 = tc7 * -2;
+		cout << "tc10:" << tc10.ToString() << endl;
+		assert(false);
+	} catch (const invalid_argument& e){
+		
+	}
+	
+	
+	// test 7, multiply by 0
+	TimeCode tc12 = tc7 * 0;
+	assert(tc12.ToString() == "0:0:0");
+	
+	cout << "PASSED!" << endl << endl;
+}
 	
 int main(){
 	
@@ -350,6 +419,9 @@ int main(){
 	TestSetMinutes();
 	TestSetHours();
 	TestSetSeconds();
+	TestMultiply();
+	TestCopyConstructor();
+
 
 	// Many othere test functions...
 	
