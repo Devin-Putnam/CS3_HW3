@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// COMMENT: I have read all the notes for this assignment
+//I have read all the notes for this assignment
 
 // Helper function: split a string into fields
 vector<string> split(const string& s, char delim);
@@ -20,11 +20,12 @@ void parseStringWithStream(const string& line, char delim) {
     stringstream ss(line);
     string item;
     while (getline(ss, item, delim)) {
-        cout << item << " | ";  // just an example of parsing
+        cout << item << " , ";  
     }
     cout << endl;
 }
 
+//Referenced the Zybook to look at the format 
 int main() {
     ifstream inFS("Space_Corrected.csv");
     if (!inFS.is_open()) {
