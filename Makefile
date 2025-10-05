@@ -5,5 +5,7 @@ all:
 
 run:
 	./tct
+	./nasa
+	./pdt
 
 try: all run

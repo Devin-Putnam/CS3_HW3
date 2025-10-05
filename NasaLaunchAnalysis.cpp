@@ -7,45 +7,95 @@
 
 using namespace std;
 
-//I have read all the notes for this assignment
+//Parse a line and return true for success and false for failure
+bool parse_line(const string& line, TimeCode& tc) {
 
-// Helper function: split a string into fields
-vector<string> split(const string& s, char delim);
-
-// Helper function: parse a line of CSV and return a TimeCode
-// If no time is found, handle appropriately
-TimeCode parse_line(const string& line) {
-    size_t pos = line.find(':');   // find the colon
-    if (pos == string::npos || pos < 2 || pos + 2 >= line.size()) {
-        return TimeCode(0,0,0);    // no valid time
+    //https://www.geeksforgeeks.org/cpp/stringnpos-in-c-with-examples/
+    size_t start = line.find('"');
+    if (start == string::npos){
+        return false;
     }
 
-    // Take 2 characters before colon
-    string hhStr = line.substr(pos - 2, 2);
-    // Take 2 characters after colon
-    string mmStr = line.substr(pos + 1, 2);
+    size_t end = line.find('"', start + 1);
 
-    // Strip non-digits (just in case)
-    string hhDigits, mmDigits;
-    for (char c : hhStr) if (isdigit((unsigned char)c)) hhDigits.push_back(c);
-    for (char c : mmStr) if (isdigit((unsigned char)c)) mmDigits.push_back(c);
+    if (end == string::npos){
+        return false;
+    } 
 
-    if (hhDigits.size() != 2 || mmDigits.size() != 2) {
-        return TimeCode(0,0,0);  // fallback
+    //https://cplusplus.com/reference/string/string/substr/
+    string dateStr = line.substr(start + 1, end - start - 1);
+
+    //Find the time by finding the colon
+    size_t colon = dateStr.find(':');
+    if (colon == string::npos || colon < 1){
+        return false;
+    } 
+
+    //Get the hours as a string
+    string hoursStr;
+    if (colon >= 2){
+        hoursStr = dateStr.substr(colon - 2, 2);
+    } 
+    else {
+        hoursStr = dateStr.substr(colon - 1, 1);
     }
 
-    unsigned int hh = stoi(hhDigits);
-    unsigned int mm = stoi(mmDigits);
+    //Find the minutes as a stirng
+    string minutesStr = dateStr.substr(colon + 1, 2);
 
-    // Validate ranges
-    if (hh > 23 || mm > 59) {
-        return TimeCode(0,0,0);
+    //Get seconds as a string
+    string secondsStr = "0";
+    size_t secondColon = dateStr.find(':', colon + 1);
+    if (secondColon != string::npos && secondColon + 2 < dateStr.size()) {
+        secondsStr = dateStr.substr(secondColon + 1, 2);
     }
 
-    return TimeCode(hh, mm, 0);  // seconds = 0
+    string hourDigits;
+    string minDigits; 
+    string secondsDigits;
+
+    for (char c : hoursStr){
+         if (isdigit((unsigned char)c)){
+            hourDigits.push_back(c);
+         }
+    }
+    for (char c : minutesStr){
+         if (isdigit((unsigned char)c)) {
+            minDigits.push_back(c);
+         }
+    }
+    for (char c : secondsStr){
+        if (isdigit((unsigned char)c)) {
+            secondsDigits.push_back(c);
+        }
+    }
+
+
+    if (hourDigits.empty() || minDigits.empty()) {
+        return false;
+    }
+
+
+    unsigned int hour = stoi(hourDigits);
+    unsigned int min = stoi(minDigits);
+    
+    unsigned int sec;
+    if (secondsDigits.empty()) {
+        sec = 0;
+    } else {
+        sec = stoi(secondsDigits);
+    }
+
+    //Validate the time components
+    if (hour > 23 || min > 59 || sec > 59){
+        return false;
+    }
+
+    //If all checks pass, create the TimeCode object and return true
+    tc = TimeCode(hour, min, sec);
+    return true;
 }
 
-//Referenced the Zybook to look at the format 
 int main() {
     ifstream inFS("Space_Corrected.csv");
     if (!inFS.is_open()) {
@@ -53,17 +103,37 @@ int main() {
         return 1;
     }
 
-    string datum;
-    while (getline(inFS, datum)) {  // loop reads line by line
-        cout << datum << endl;       // print the line
-        parseStringWithStream(datum, ','); // parse each line
-    }
+    string line;
+    vector<TimeCode> times;
 
-    if (!inFS.eof()) {
-        cout << "Input failure before reaching end of file." << endl;
+    // Skips the first line
+    getline(inFS, line);
+
+    //Read and Parse
+    while (getline(inFS, line)) {
+        TimeCode temp_tc;
+        if (parse_line(line, temp_tc)) {
+            times.push_back(temp_tc);
+        }
     }
 
     inFS.close();
+
+    cout << times.size() << " data points." << endl;
+
+    //Sums the times
+    if (!times.empty()) {
+        TimeCode total(0,0,0);
+        for (const TimeCode& tc : times) {
+            total = total + tc;
+        }
+
+        //Gets the average
+        TimeCode average = total / times.size();
+        cout << "AVERAGE: " << average.ToString() << endl;
+    } else {
+        cout << "No valid time data found." << endl;
+    }
+
     return 0;
 }
-

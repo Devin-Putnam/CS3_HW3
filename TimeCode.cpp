@@ -87,10 +87,24 @@ void TimeCode::GetComponents(unsigned int& hr, unsigned int& min, unsigned int& 
 
 //Formats the output for the user
 string TimeCode::ToString() const {
+    unsigned int h = GetHours();
+    unsigned int m = GetMinutes();
+    unsigned int s = GetSeconds();
+
     ostringstream oss;
-    oss << GetHours() << ':' << GetMinutes() << ':' << GetSeconds();
+    oss << h << ":";
+
+    // Pad minutes
+    if (m < 10) oss << "0";
+    oss << m << ":";
+
+    // Pad seconds
+    if (s < 10) oss << "0";
+    oss << s;
+
     return oss.str();
 }
+
 
 //Checks for addition as per the assignment 
 TimeCode TimeCode::operator+(const TimeCode& other) const {
